@@ -10,7 +10,19 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeStyle: "short"
 })
 
-export function TaskItem({ task }: { task: Task }) {
+type TaskItemProps = {
+  task: Task
+  isDeleting: boolean
+  canDelete: boolean
+  onDelete: () => void
+}
+
+// Rendered inside TaskList (a Client Component), so it can use event handlers.
+export function TaskItem({ task, isDeleting, canDelete, onDelete }: TaskItemProps) {
+  function handleDelete() {
+    if (window.confirm(`Delete "${task.titulo}"? This cannot be undone.`)) onDelete()
+  }
+
   return (
     <li className="rounded border border-gray-200 p-4 dark:border-gray-700">
       <div className="flex items-start justify-between gap-4">
@@ -27,9 +39,19 @@ export function TaskItem({ task }: { task: Task }) {
             {dateFormatter.format(task.dataCriacao)}
           </time>
         </div>
-        <Link href={`/tasks/${task.id}`} className="shrink-0 text-sm text-blue-600 hover:underline">
-          Edit
-        </Link>
+        <div className="flex shrink-0 items-center gap-3 text-sm">
+          <Link href={`/tasks/${task.id}`} className="text-blue-600 hover:underline">
+            Edit
+          </Link>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={!canDelete}
+            className="text-red-600 hover:underline disabled:opacity-50"
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        </div>
       </div>
     </li>
   )
