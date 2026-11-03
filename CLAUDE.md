@@ -29,7 +29,9 @@ API keys. All sample data must be fictional.
 - **Next.js 15** (App Router) — pin major version 15, as required by the spec
 - **React 19** with function components and hooks
 - **TypeScript** in `strict` mode
-- **tRPC v11** (`@trpc/server`, `@trpc/client`, `@trpc/tanstack-react-query`)
+- **tRPC v11** (`@trpc/server`, `@trpc/client`, `@trpc/tanstack-react-query`) —
+  keep all three `@trpc/*` packages on the **same exact version** (their peer
+  dependencies require it)
 - **TanStack Query v5**
 - **Zod** for input validation
 - **superjson** as the tRPC transformer
@@ -49,25 +51,27 @@ Do not add dependencies beyond these without asking first.
 
 ## Expected folder structure
 
+No `src/` directory: everything lives at the project root, and the `@/*` path
+alias points to `./*`.
+
 ```
-src/
-  app/
-    api/trpc/[trpc]/route.ts   # tRPC HTTP handler (fetchRequestHandler)
-    page.tsx                   # task list (SSR)
-    tasks/new/page.tsx         # create
-    tasks/[id]/page.tsx        # edit
-    layout.tsx
-  components/                  # UI components (TaskList, TaskForm, Feedback...)
-  server/
-    trpc.ts                    # initTRPC, context, base procedures
-    store.ts                   # in-memory storage
-    routers/
-      _app.ts                  # appRouter + exported AppRouter type
-      task.ts                  # task router (CRUD)
-  trpc/
-    client.tsx                 # client-side provider (QueryClient + tRPC)
-    server.tsx                 # server-side helpers (caller / prefetch for SSR)
-    query-client.ts            # QueryClient factory
+app/
+  api/trpc/[trpc]/route.ts     # tRPC HTTP handler (fetchRequestHandler)
+  page.tsx                     # task list (SSR)
+  tasks/new/page.tsx           # create
+  tasks/[id]/page.tsx          # edit
+  layout.tsx
+components/                    # UI components (TaskList, TaskForm, Feedback...)
+server/
+  trpc.ts                      # initTRPC, context, base procedures
+  store.ts                     # in-memory storage
+  routers/
+    _app.ts                    # appRouter + exported AppRouter type
+    task.ts                    # task router (CRUD)
+trpc/
+  client.tsx                   # client-side provider (QueryClient + tRPC)
+  server.tsx                   # server-side helpers (caller / prefetch for SSR)
+  query-client.ts              # QueryClient factory
 ```
 
 ## Data model
