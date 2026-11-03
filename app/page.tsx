@@ -7,12 +7,18 @@ import { TaskList } from "@/components/task-list"
 export const dynamic = "force-dynamic"
 
 // Passed down to TaskList so the client reads exactly the query prefetched here.
-const TASKS_PAGE_SIZE = 10
+const TASKS_PAGE_SIZE = 5
 
-// Server Component: the first page is fetched on the server and dehydrated into
-// the HTML, so tasks show up without a loading state or an extra client request.
+// Server Component: only the first page is fetched on the server and dehydrated
+// into the HTML, so tasks show up without a loading state. The next pages are
+// loaded by the client as the user scrolls (infinite scroll in TaskList).
 export default async function HomePage() {
-  await getQueryClient().query(trpc.task.list.queryOptions({ limit: TASKS_PAGE_SIZE }))
+  await getQueryClient().infiniteQuery(
+    trpc.task.list.infiniteQueryOptions(
+      { limit: TASKS_PAGE_SIZE },
+      { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    )
+  )
 
   return (
     <main className="mx-auto max-w-2xl p-6 font-sans">
