@@ -61,7 +61,7 @@ app/
   tasks/new/page.tsx           # create
   tasks/[id]/page.tsx          # edit
   layout.tsx
-components/                    # UI components (TaskList, TaskForm, Feedback...)
+components/                    # UI components (task-list.tsx, task-form.tsx, feedback.tsx...)
 server/
   trpc.ts                      # initTRPC, context, base procedures
   store.ts                     # in-memory storage
@@ -124,6 +124,11 @@ type Task = {
 
 ## Code conventions
 
+- **All file and folder names use kebab-case** (e.g. `task-list.tsx`,
+  `task-form.tsx`, `query-client.ts`), including component files. The component
+  itself is still exported in PascalCase (`export function TaskList`). Only
+  Next.js reserved names and route segments are exempt (`page.tsx`, `layout.tsx`,
+  `route.ts`, `[id]`, `[trpc]`) and the `_app.ts` router entry.
 - Function components only, no classes.
 - Avoid `any`. Infer types from `AppRouter` (`inferRouterOutputs`) instead of
   duplicating them.
