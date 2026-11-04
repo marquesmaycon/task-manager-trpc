@@ -1,47 +1,42 @@
-import { TRPCError } from "@trpc/server"
-import Link from "next/link"
-import { TaskForm } from "@/components/task-form"
-import { getQueryClient, trpc } from "@/trpc/server"
+"use client"
 
-// Tasks change at runtime, so the page is rendered on every request.
-export const dynamic = "force-dynamic"
+import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
+import { use } from "react"
+import { TaskForm } from "@/components/task-form"
+import { useTRPC } from "@/trpc/client"
 
 type EditTaskPageProps = {
   params: Promise<{ id: string }>
 }
 
-// Server Component: the task is fetched on the server (router called directly, no
-// HTTP round-trip) so the form is already filled in the initial HTML.
-// Caveat: with in-memory storage on serverless, this render may run on an instance
-// with its own memory and miss a task created through another one.
-export default async function EditTaskPage({ params }: EditTaskPageProps) {
-  const { id } = await params
-  const task = await fetchTask(id)
+// Unlike the list, this page loads the task in the browser, through /api/trpc: the
+// same route that creates and deletes tasks. With in-memory storage on serverless,
+// a page rendered on the server can run on another instance with its own memory
+// and miss tasks created through the API. With a database it would load on the server.
+export default function EditTaskPage({ params }: EditTaskPageProps) {
+  const { id } = use(params)
+  const trpc = useTRPC()
+  // No retries: "Task not found" will not change by asking again.
+  const { data: task, error, isPending } = useQuery(
+    trpc.task.byId.queryOptions({ id }, { retry: false })
+  )
 
   return (
     <main className="mx-auto max-w-2xl p-6 font-sans">
       <h1 className="mb-6 text-2xl font-semibold">Edit task</h1>
-      {task ? (
-        <TaskForm task={task} />
-      ) : (
+      {isPending ? (
+        <p className="text-gray-500">Loading task...</p>
+      ) : error ? (
         <div role="alert" className="flex flex-col gap-2">
-          <p className="text-red-600">Task not found</p>
+          <p className="text-red-600">{error.message}</p>
           <Link href="/" className="text-sm text-blue-600 hover:underline">
             Back to tasks
           </Link>
         </div>
+      ) : (
+        <TaskForm task={task} />
       )}
     </main>
   )
-}
-
-// Returns null for NOT_FOUND so the page can show a friendly message; any other
-// error is rethrown to Next.js's error handling.
-async function fetchTask(id: string) {
-  try {
-    return await getQueryClient().query(trpc.task.byId.queryOptions({ id }))
-  } catch (error) {
-    if (error instanceof TRPCError && error.code === "NOT_FOUND") return null
-    throw error
-  }
 }
