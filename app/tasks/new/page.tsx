@@ -1,4 +1,7 @@
+import type { Metadata } from "next"
 import { TaskForm } from "@/components/task-form"
+
+export const metadata: Metadata = { title: "New task" }
 
 export default function NewTaskPage() {
   return (

@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import { TRPCError } from "@trpc/server"
 import { notFound } from "next/navigation"
 import { TaskForm } from "@/components/task-form"
 import { getQueryClient, trpc } from "@/trpc/server"
+
+export const metadata: Metadata = { title: "Edit task" }
 
 type EditTaskPageProps = {
   params: Promise<{ id: string }>
