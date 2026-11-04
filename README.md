@@ -158,3 +158,30 @@ Other scripts:
 | `npm run lint`  | Run ESLint                         |
 
 No environment variables are needed.
+
+## Requirements checklist
+
+**Project setup**
+- [x] Next.js 15 project
+- [x] tRPC configured so the frontend consumes the backend procedures
+
+**Backend (tRPC)**
+- [x] Task model with `id` (auto-generated), `titulo` (required), `descricao` (optional)
+  and `dataCriacao` (timestamp)
+- [x] Create, list, update and delete procedures
+- [x] Tasks cannot be created without a title (Zod validation)
+- [x] Meaningful errors: `NOT_FOUND` for unknown tasks, `BAD_REQUEST` for invalid input
+
+**Frontend**
+- [x] Task list pre-loaded with Server-Side Rendering
+- [x] Simple layout
+- [x] Delete from the list, with success/error feedback
+- [x] One form to create and edit tasks
+- [x] Function components and hooks for form state
+- [x] Form validation (an empty title cannot be submitted)
+- [x] Error messages from both the backend and the frontend
+- [x] Loading, success and error states
+
+**Bonus**
+- [x] Infinite scroll
+- [x] Comments explaining the main decisions, plus this README
