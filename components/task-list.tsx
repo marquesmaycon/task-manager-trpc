@@ -10,7 +10,6 @@ type TaskListProps = {
   pageSize: number
 }
 
-// Client Component because it owns the interactive parts of the list (delete, infinite scroll)
 export function TaskList({ pageSize }: TaskListProps) {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
@@ -33,11 +32,9 @@ export function TaskList({ pageSize }: TaskListProps) {
   )
   const deletingId = deleteMutation.isPending ? deleteMutation.variables.id : null
 
-  // Loads the next page when an empty element after the last task scrolls into
-  // view. The observer is recreated after every fetch: `observe()` reports the
-  // current state right away, so if the sentinel is still on screen (the new page
-  // was too short to push it away) the next page is requested without more scrolling.
-  // It also stops after a failed fetch, so a broken request is not retried in a loop.
+  // Loads the next page when the sentinel after the last task scrolls into view.
+  // Recreating the observer after each fetch re-checks a sentinel that is still
+  // visible (short page); pausing on error avoids retrying a failed request in a loop.
   const sentinelRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const sentinel = sentinelRef.current

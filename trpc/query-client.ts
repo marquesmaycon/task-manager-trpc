@@ -1,4 +1,4 @@
-import { defaultShouldDehydrateQuery, MutationCache, QueryClient } from "@tanstack/react-query"
+import { MutationCache, QueryClient } from "@tanstack/react-query"
 import { TRPCClientError } from "@trpc/client"
 import superjson from "superjson"
 import type { AppRouter } from "@/server/routers/_app"
@@ -36,8 +36,7 @@ export function makeQueryClient() {
       // superjson is used here too so `Date` fields survive the server → client
       // handoff done by `dehydrate` / `HydrationBoundary`.
       dehydrate: {
-        serializeData: superjson.serialize,
-        shouldDehydrateQuery: (query) => defaultShouldDehydrateQuery(query) || query.state.status === "pending"
+        serializeData: superjson.serialize
       },
       hydrate: {
         deserializeData: superjson.deserialize

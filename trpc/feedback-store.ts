@@ -1,10 +1,11 @@
-// A tiny store holding the current global feedback message (success or error).
+// A plain module store instead of React Context: errors are reported by the
+// QueryClient's MutationCache, which lives outside the React tree. Components
+// read it with `useSyncExternalStore`.
 export type FeedbackMessage = {
   type: "success" | "error"
   text: string
 }
 
-// Messages hide themselves after this delay so they never pile up on screen.
 const AUTO_DISMISS_MS = 5000
 
 let current: FeedbackMessage | null = null

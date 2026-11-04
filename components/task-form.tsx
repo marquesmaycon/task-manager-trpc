@@ -12,7 +12,6 @@ import { showSuccess } from "@/trpc/feedback-store"
 type Task = inferRouterOutputs<AppRouter>["task"]["byId"]
 
 type TaskFormProps = {
-  // When a task is given the form edits it; otherwise it creates a new one.
   task?: Task
 }
 
@@ -25,7 +24,7 @@ export function TaskForm({ task }: TaskFormProps) {
   const [descricao, setDescricao] = useState(task?.descricao ?? "")
   const [titleError, setTitleError] = useState<string | null>(null)
 
-  // Invalidates every task query (list and byId) whether the request worked or not
+  // pathFilter() covers both list and byId, so the edited task is never stale.
   const onSettled = () => queryClient.invalidateQueries(trpc.task.pathFilter())
 
   const onSuccessGoToList = (message: string) => () => {

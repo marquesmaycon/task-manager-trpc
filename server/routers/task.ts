@@ -28,8 +28,9 @@ function notFound(): never {
 
 export const taskRouter = createTRPCRouter({
   // The cursor is the `dataCriacao` timestamp of the last task already loaded.
-  // Unlike an offset, it stays correct when tasks are created or deleted between
-  // page loads, which happens all the time on a list with inline delete.
+  // Unlike an offset, it does not skip or repeat tasks when others are created or
+  // deleted between page loads. Limitation: tasks created in the same millisecond
+  // would share a cursor; acceptable for an in-memory demo.
   list: publicProcedure
     .input(
       z.object({
