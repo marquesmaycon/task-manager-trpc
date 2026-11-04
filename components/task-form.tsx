@@ -2,7 +2,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { inferRouterOutputs } from "@trpc/server"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { AppRouter } from "@/server/routers/_app"
@@ -42,6 +41,11 @@ export function TaskForm({ task }: TaskFormProps) {
 
   // Stays disabled after success so the form cannot be sent twice while navigating.
   const isBusy = mutation.isPending || mutation.isSuccess
+
+  function handleCancel() {
+    if (window.history.length > 1) router.back()
+    else router.push("/")
+  }
 
   function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -106,9 +110,13 @@ export function TaskForm({ task }: TaskFormProps) {
         >
           {mutation.isPending ? "Saving..." : task ? "Save changes" : "Create task"}
         </button>
-        <Link href="/" className="text-sm text-gray-600 hover:underline dark:text-gray-400">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="text-sm text-gray-600 hover:underline dark:text-gray-400"
+        >
           Cancel
-        </Link>
+        </button>
       </div>
     </form>
   )

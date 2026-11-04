@@ -14,7 +14,7 @@ function minutesAgo(minutes: number) {
 }
 
 // Seed tasks get fixed ids instead of random UUIDs: in serverless each instance
-// builds its own seed, and the list and edit pages may run on different instances.
+// builds its own seed, and the list page and /api/trpc may run on different instances.
 // Fixed ids keep a seed task's link valid no matter which instance serves it.
 function createSeed(): Map<string, Task> {
   const seed: Omit<Task, "id">[] = [

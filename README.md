@@ -15,7 +15,7 @@ and delete tasks. The backend keeps tasks **in memory**, so there is no database
 - **Feedback for every action.** Buttons are disabled and show "Saving..." or "Deleting..."
   while a request runs. A success or error message appears afterwards and hides itself
   after a few seconds.
-- **Meaningful errors.** Unknown tasks return `NOT_FOUND`, and the edit page shows a 404.
+- **Meaningful errors.** Unknown tasks return `NOT_FOUND`, and the edit page shows "Task not found".
   Invalid input returns `BAD_REQUEST` with the Zod message, for example "Title is required".
 - **Basic accessibility.** Inputs have labels, field errors are linked to their inputs,
   and messages are announced to screen readers.
@@ -41,7 +41,7 @@ QueryClient (one per request) ──dehydrate──► HTML + serialized cache
                               HydrationBoundary fills the browser cache
                                                   │
                                                   ▼
-               Client Components (TaskList, TaskForm) read that cache and
+               Client Components (TaskList) read that cache and
                make every later request over HTTP to /api/trpc
 ```
 
@@ -51,7 +51,8 @@ QueryClient (one per request) ──dehydrate──► HTML + serialized cache
 2. **Hydration.** `HydrateClient` dehydrates that QueryClient into the page. In the
    browser, `TaskList` finds the data already in its cache and renders it without
    fetching again.
-3. **Client.** Everything after that (loading more pages, create, update, delete) goes
+3. **Client.** Everything after that (loading more pages, loading a task to edit, create,
+   update, delete) goes
    through the tRPC client in `trpc/client.tsx` to the HTTP handler at
    `app/api/trpc/[trpc]/route.ts`. After a mutation, the related queries are invalidated
    so the list refreshes.
@@ -63,7 +64,8 @@ app/
   api/trpc/[trpc]/route.ts   tRPC HTTP handler
   page.tsx                   task list (SSR + hydration)
   tasks/new/page.tsx         create page
-  tasks/[id]/page.tsx        edit page (task loaded on the server)
+  tasks/[id]/page.tsx        edit page (task loaded in the browser)
+  tasks/[id]/layout.tsx      edit page title (the page is a Client Component)
   layout.tsx                 providers, header, global feedback
 components/
   task-list.tsx              list, delete, infinite scroll
@@ -94,7 +96,7 @@ trpc/
 
 ```ts
 type Task = {
-  id: string;          // crypto.randomUUID()
+  id: string;          // crypto.randomUUID() (sample tasks use fixed ids)
   titulo: string;      // required
   descricao?: string;  // optional
   dataCriacao: Date;   // set by the server
@@ -123,8 +125,12 @@ type Task = {
 - **Types inferred from the router.** The UI types come from `inferRouterOutputs<AppRouter>`,
   so they can't drift from the API. Only the router's *type* is imported on the client,
   so no server code ends up in the browser bundle.
-- **Small Client Components.** Pages are Server Components. Only the parts that need
-  interactivity (list, form, feedback) use `"use client"`.
+- **Edit page loads the task in the browser.** It fetches through `/api/trpc`, the same
+  route that creates and deletes tasks. On serverless, a page rendered on the server can
+  run on another instance with its own memory and miss tasks created through the API.
+  Sample tasks have fixed ids for the same reason.
+- **Small Client Components.** Pages are Server Components, except the edit page (see
+  above). Only the parts that need interactivity (list, form, feedback) use `"use client"`.
 
 ## Known limitations
 
